@@ -71,8 +71,9 @@
         },
         body: JSON.stringify(command)
       })
-      .then(response => response.json())
+      .then(response => response.json())  // Espera pela resposta JSON
       .then(data => {
+        console.log(data);  // Exibe a resposta para depuração
         if (data.message === 'Música iniciada!') {
           console.log('Música iniciada com sucesso');
           
@@ -97,7 +98,9 @@
           console.error('Erro ao iniciar a música:', data.error);
         }
       })
-      .catch(error => console.error('Erro na conexão com o servidor:', error));
+      .catch(error => {
+        console.error('Erro na conexão com o servidor:', error);
+      });
     }
 
     // Função para carregar músicas e exibi-las no menu
@@ -107,35 +110,4 @@
         .then(data => {
           const songsMenu = document.getElementById('songsMenu');
           data.songs.forEach(song => {
-            const item = document.createElement('div');
-            item.classList.add('item');
-            item.setAttribute('data-video', song.video);
-            item.innerHTML = `
-              <img src="${song.image}" alt="${song.title}" style="width: 100px; height: auto;">
-              <div class="title">${song.title}</div>
-              <div class="artist">${song.artist}</div>
-              <div class="edition">${song.edition}</div>
-            `;
-            item.addEventListener('click', function () {
-              // Envia comando ao servidor com a música selecionada
-              sendCommandToServer({
-                action: 'play_song',
-                song: {
-                  title: song.title,
-                  artist: song.artist,
-                  video: song.video
-                }
-              });
-            });
-            songsMenu.appendChild(item);
-          });
-        })
-        .catch(error => console.error('Erro ao carregar o arquivo JSON:', error));
-    }
-
-    // Carrega as músicas assim que a página é carregada
-    window.onload = loadSongs;
-  </script>
-
-</body>
-</html>
+            const item = document.create
