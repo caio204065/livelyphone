@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Música</title>
+  <title>Iniciar Música</title>
   <style>
     body {
       margin: 0;
@@ -22,25 +22,6 @@
       margin-bottom: 20px;
       font-size: 1.5em;
       color: #ff0099;
-    }
-
-    .button {
-      width: 90%;
-      max-width: 300px;
-      padding: 15px;
-      margin: 10px 0;
-      text-align: center;
-      background-color: #ff0099;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1.2em;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .button:hover {
-      background-color: #ff3399;
     }
 
     .input-group {
@@ -65,53 +46,53 @@
       background-color: #333;
       color: white;
     }
+
+    .button {
+      width: 90%;
+      max-width: 300px;
+      padding: 15px;
+      text-align: center;
+      background-color: #ff0099;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #ff3399;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Controle de Música</h1>
+  <h1>Tocar Música</h1>
 
   <div class="input-group">
-    <label for="song-title">Título da Música</label>
-    <input type="text" id="song-title" placeholder="Ex: Minha Música">
+    <label for="song-name">Nome da Música</label>
+    <input type="text" id="song-name" placeholder="Digite o nome da música">
   </div>
 
-  <div class="input-group">
-    <label for="song-artist">Artista</label>
-    <input type="text" id="song-artist" placeholder="Ex: Meu Artista">
-  </div>
-
-  <div class="input-group">
-    <label for="song-url">URL do Vídeo</label>
-    <input type="text" id="song-url" placeholder="Ex: https://example.com/video.mp4">
-  </div>
-
-  <button class="button" onclick="sendCommand('play_song')">Tocar Música</button>
-  <button class="button" onclick="sendCommand('pause_song')">Pausar Música</button>
-  <button class="button" onclick="sendCommand('resume_song')">Retomar Música</button>
-  <button class="button" onclick="sendCommand('stop_song')">Parar Música</button>
+  <button class="button" onclick="playMusic()">Tocar Música</button>
 
   <script>
-    // Função para enviar comandos ao servidor
-    function sendCommand(action) {
+    // Função para enviar o comando ao servidor
+    function playMusic() {
+      const songName = document.getElementById('song-name').value.trim();
       const serverUrl = 'https://glorious-nervous-peridot.glitch.me'; // URL do servidor
-      const command = { action };
 
-      // Se o comando for "play_song", inclua os dados da música
-      if (action === 'play_song') {
-        const title = document.getElementById('song-title').value;
-        const artist = document.getElementById('song-artist').value;
-        const video = document.getElementById('song-url').value;
-
-        if (!title || !artist || !video) {
-          alert('Por favor, preencha todos os campos antes de tocar a música.');
-          return;
-        }
-
-        command.song = { title, artist, video };
+      if (!songName) {
+        alert('Por favor, insira o nome da música.');
+        return;
       }
 
-      // Envia o comando para o servidor
+      const command = {
+        action: 'play_song',
+        song: { title: songName }
+      };
+
       fetch(serverUrl, {
         method: 'POST',
         headers: {
@@ -121,7 +102,7 @@
       })
         .then((response) => {
           if (response.ok) {
-            alert('Comando enviado com sucesso!');
+            alert(`Comando para tocar "${songName}" enviado com sucesso!`);
           } else {
             alert('Erro ao enviar comando: ' + response.status);
           }
