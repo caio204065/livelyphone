@@ -64,7 +64,9 @@
   <script>
     // Função para enviar comandos ao servidor
     function sendCommandToServer(command) {
-      fetch('https://glorious-nervous-peridot.glitch.me', {
+      console.log("Enviando comando para o servidor:", command); // Depuração: Comando sendo enviado
+      
+      fetch('https://clear-glimmer-pet.glitch.me/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -73,7 +75,7 @@
       })
       .then(response => response.json())  // Espera pela resposta JSON
       .then(data => {
-        console.log(data);  // Exibe a resposta para depuração
+        console.log("Resposta do servidor:", data);  // Exibe a resposta para depuração
         if (data.message === 'Música iniciada!') {
           console.log('Música iniciada com sucesso');
           
@@ -106,8 +108,51 @@
     // Função para carregar músicas e exibi-las no menu
     function loadSongs() {
       fetch('songs.json')
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Falha ao carregar o arquivo JSON.");
+          }
+          return response.json();
+        })
         .then(data => {
+          console.log("Músicas carregadas:", data);  // Depuração: Músicas carregadas
+          
           const songsMenu = document.getElementById('songsMenu');
           data.songs.forEach(song => {
-            const item = document.create
+            const item = document.createElement('div');
+            item.classList.add('item');
+            item.setAttribute('data-video', song.video);
+            item.innerHTML = `
+              <img src="${song.image}" alt="${song.title}" style="width: 100px; height: auto;">
+              <div class="title">${song.title}</div>
+              <div class="artist">${song.artist}</div>
+              <div class="edition">${song.edition}</div>
+            `;
+            item.addEventListener('click', function () {
+              // Envia comando ao servidor com a música selecionada
+              sendCommandToServer({
+                action: 'play_song',
+                song: {
+                  title: song.title,
+                  artist: song.artist,
+                  video: song.video
+                }
+              });
+            });
+            songsMenu.appendChild(item);
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao carregar o arquivo JSON:', error);
+        });
+    }
+
+    // Carrega as músicas assim que a página é carregada
+    window.onload = function() {
+      console.log("Página carregada, iniciando o carregamento das músicas...");
+      loadSongs();
+    };
+  </script>
+
+</body>
+</html>
