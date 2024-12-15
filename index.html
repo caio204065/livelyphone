@@ -1,158 +1,62 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Música</title>
-  <style>
-    /* Estilos básicos */
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    #gameplayContainer {
-      display: none;
-      margin-top: 20px;
-      text-align: center;
-    }
-    video {
-      width: 100%;
-      max-width: 600px;
-    }
-    #songsMenu {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .item {
-      padding: 10px;
-      margin: 5px;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      width: 80%;
-      max-width: 400px;
-      text-align: left;
-    }
-    .item:hover {
-      background-color: #f0f0f0;
-    }
-    .title {
-      font-weight: bold;
-      margin-top: 5px;
-    }
-    .artist, .edition {
-      color: #555;
-    }
-  </style>
-</head>
-<body>
+/* Geral */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <h1>Controle de Música</h1>
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #f0f0f0;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+}
 
-  <div id="songsMenu">
-    <!-- As músicas serão carregadas aqui -->
-  </div>
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #444;
+}
 
-  <div id="gameplayContainer">
-    <video id="gameplayVideo" controls>
-      Seu navegador não suporta vídeo.
-    </video>
-  </div>
+/* Botões de controle */
+.songButton {
+  background-color: #8a2be2;
+  color: white;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border: 2px solid #8a2be2;
+  border-radius: 5px;
+  margin: 10px;
+  cursor: pointer;
+  width: 80%;
+  max-width: 300px;
+  margin: 10px auto;
+}
 
-  <script>
-    // Função para enviar comandos ao servidor
-    function sendCommandToServer(command) {
-      console.log("Enviando comando para o servidor:", command); // Depuração: Comando sendo enviado
-      
-      fetch('https://clear-glimmer-pet.glitch.me/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(command)
-      })
-      .then(response => response.json())  // Espera pela resposta JSON
-      .then(data => {
-        console.log("Resposta do servidor:", data);  // Exibe a resposta para depuração
-        if (data.message === 'Música iniciada!') {
-          console.log('Música iniciada com sucesso');
-          
-          // Obtém a URL do vídeo
-          const videoUrl = command.song.video;
-          const videoElement = document.getElementById('gameplayVideo');
-          const container = document.getElementById('gameplayContainer');
+.songButton:hover {
+  background-color: #7a1bce;
+}
 
-          // Limpa a fonte anterior e reinicia a reprodução
-          videoElement.pause();  // Pausa o vídeo atual (se estiver tocando)
-          videoElement.currentTime = 0;  // Reseta o tempo do vídeo
+#gameplayVideo {
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
+  display: none;
+}
 
-          // Verifica se há uma URL do vídeo
-          if (videoUrl) {
-            videoElement.src = videoUrl;  // Define a nova URL do vídeo
-            videoElement.play();           // Inicia a reprodução do novo vídeo
-            container.style.display = 'block';  // Exibe o container de vídeo
-          } else {
-            console.error('URL do vídeo não encontrada.');
-          }
-        } else {
-          console.error('Erro ao iniciar a música:', data.error);
-        }
-      })
-      .catch(error => {
-        console.error('Erro na conexão com o servidor:', error);
-      });
-    }
+/* Estilo da mensagem */
+#message {
+  font-size: 1.2em;
+  margin-top: 20px;
+  color: #007f00;
+  background-color: #e0e0e0;
+  padding: 10px;
+  border-radius: 5px;
+  display: none;
+}
 
-    // Função para carregar músicas e exibi-las no menu
-    function loadSongs() {
-      fetch('songs.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Falha ao carregar o arquivo JSON.");
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log("Músicas carregadas:", data);  // Depuração: Músicas carregadas
-          
-          const songsMenu = document.getElementById('songsMenu');
-          data.songs.forEach(song => {
-            const item = document.createElement('div');
-            item.classList.add('item');
-            item.setAttribute('data-video', song.video);
-            item.innerHTML = `
-              <img src="${song.image}" alt="${song.title}" style="width: 100px; height: auto;">
-              <div class="title">${song.title}</div>
-              <div class="artist">${song.artist}</div>
-              <div class="edition">${song.edition}</div>
-            `;
-            item.addEventListener('click', function () {
-              // Envia comando ao servidor com a música selecionada
-              sendCommandToServer({
-                action: 'play_song',
-                song: {
-                  title: song.title,
-                  artist: song.artist,
-                  video: song.video
-                }
-              });
-            });
-            songsMenu.appendChild(item);
-          });
-        })
-        .catch(error => {
-          console.error('Erro ao carregar o arquivo JSON:', error);
-        });
-    }
-
-    // Carrega as músicas assim que a página é carregada
-    window.onload = function() {
-      console.log("Página carregada, iniciando o carregamento das músicas...");
-      loadSongs();
-    };
-  </script>
-
-</body>
-</html>
+/* Estilo da lista de músicas */
+#songList {
+  margin-top: 20px;
+}
